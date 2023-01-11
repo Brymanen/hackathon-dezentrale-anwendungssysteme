@@ -4,6 +4,11 @@ coverage
 coverage.json
 typechain
 typechain-types
+.git
+contracts/artifacts
+utils/artifacts
+
+
 
 # Hardhat files
 cache
