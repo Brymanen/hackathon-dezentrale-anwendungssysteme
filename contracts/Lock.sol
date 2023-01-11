@@ -31,6 +31,4 @@ contract Lock {
 
         owner.transfer(address(this).balance);
     }
-
-    // marv war hier
 }
