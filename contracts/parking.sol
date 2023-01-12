@@ -6,14 +6,14 @@ import "./ownable.sol";
 contract Parking is Ownable {
     mapping (bytes32 => uint) public endDate;
 
+
+
+    function getOrderComparePrice(uint transactionNumber, uint price) external onlyOwner {
+        
+    }
+
     function saveLicensePlate(string memory licensePlate, uint duration) external onlyOwner {
         bytes32 licensePlateHash = keccak256(abi.encodePacked(licensePlate));
-        //uint licensePlateHash = string(keccak256(abi.encodePacked(licensePlate)));
-        //uint zahl;
-        //zahl = 500;
-        //return zahl;
-
-        //return endDate[licensePlate];
         if (endDate[licensePlateHash] > 0) {
             updateDuration(licensePlateHash, duration);
         } else {
@@ -31,5 +31,4 @@ contract Parking is Ownable {
     function verifyLicensePlate(bytes32 licensePlateHash) external view returns(bool) {
         return block.timestamp < endDate[licensePlateHash];
     }
-
 }
