@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-contract OrdersData {
+library OrdersData {
     
     struct Order {
         uint price;
@@ -9,7 +9,7 @@ contract OrdersData {
         bytes32 licensePlateHash;
     }
 
-    Order[] public orders;
+    
 
-    mapping (uint => Order) public transactionNumberToOrder;
+    
 }

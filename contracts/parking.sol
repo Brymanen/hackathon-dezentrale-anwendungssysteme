@@ -7,11 +7,12 @@ import "./ordersdata.sol";
 
 contract Parking is Ownable, OrdersData {
     using SafeMath for uint256;
-
+    OrdersData.Order[] public orders;
+    mapping (uint => OrdersData.Order) public transactionNumberToOrder;
     mapping (bytes32 => uint) public endDate;
 
     function getOrderComparePrice(uint transactionNumber, uint price) external onlyOwner returns (uint) {
-        Order storage currentOrder = transactionNumberToOrder[transactionNumber];
+        OdersData.Order storage currentOrder = orders[orderId];
         return currentOrder.price;
     }
 
