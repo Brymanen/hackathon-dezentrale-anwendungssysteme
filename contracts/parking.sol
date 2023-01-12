@@ -2,14 +2,17 @@
 pragma solidity 0.8.17;
 
 import "./ownable.sol";
+import "./safemath.sol";
+import "./ordersdata.sol";
 
-contract Parking is Ownable {
+contract Parking is Ownable, OrdersData {
+    using SafeMath for uint256;
+
     mapping (bytes32 => uint) public endDate;
 
-
-
-    function getOrderComparePrice(uint transactionNumber, uint price) external onlyOwner {
-        
+    function getOrderComparePrice(uint transactionNumber, uint price) external onlyOwner returns (uint) {
+        Order storage currentOrder = transactionNumberToOrder[transactionNumber];
+        return currentOrder.price;
     }
 
     function saveLicensePlate(string memory licensePlate, uint duration) external onlyOwner {
@@ -17,14 +20,14 @@ contract Parking is Ownable {
         if (endDate[licensePlateHash] > 0) {
             updateDuration(licensePlateHash, duration);
         } else {
-            endDate[licensePlateHash] = block.timestamp + duration;
+            endDate[licensePlateHash] = block.timestamp.add(duration);
         }
     }
     function updateDuration(bytes32 licensePlateHash, uint duration) internal {
         if (block.timestamp > endDate[licensePlateHash]) {
-            endDate[licensePlateHash] = block.timestamp + duration;
+            endDate[licensePlateHash] = block.timestamp.add(duration);
         } else {
-            endDate[licensePlateHash] = endDate[licensePlateHash] + duration;
+            endDate[licensePlateHash] = endDate[licensePlateHash].add(duration);
         }
     }
 
