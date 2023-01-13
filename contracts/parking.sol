@@ -36,7 +36,7 @@ contract Parking is Ownable, OrdersData {
             endDate[licensePlateHash] = block.timestamp.add(duration);
         }
     }
-    
+
     function updateDuration(bytes32 licensePlateHash, uint duration) internal {
         if (block.timestamp > endDate[licensePlateHash]) {
             endDate[licensePlateHash] = block.timestamp.add(duration);
@@ -45,7 +45,8 @@ contract Parking is Ownable, OrdersData {
         }
     }
 
-    function verifyLicensePlate(bytes32 licensePlateHash) external view returns(bool) {
+    function verifyLicensePlate(string memory licensePlate) external view returns(bool) {
+        bytes32 licensePlateHash = keccak256(abi.encodePacked(licensePlate));
         return block.timestamp < endDate[licensePlateHash];
     }
 }
