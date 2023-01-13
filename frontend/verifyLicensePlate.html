@@ -13,9 +13,9 @@
     <form class="verificationForm" action="index.html" method="post">
       <label for="licensePlate">Insert the License Plate:</label>
       <input type="text" id="licensePlate" name="licensePlate">
-      <input type="submit" value="Submit">
+      <input type="submit" id="submit" value="Submit">
     </form>
-    <button type="button" id="buttonLicensePlate" name="button">Click me</button>
+    <button onclick="verifyLicense()" type="button" id="buttonLicensePlate" name="button">Click me</button>
     <div class="output" id="output">
 
     </div>
@@ -162,6 +162,26 @@
             const data = await window.contract.methods.owner().call();
             document.getElementById("dataArea").innerHTML = data;
         }
+
+        const verifyLicense = async () => {
+            alert("hello World");
+            const data1 = await window.contract.methods.verifyLicense("12").call();
+            document.getElementById("dataArea").innerHTML = data1;
+            // window.contract.methods.verifyLicensePlate(
+            // document.getElementById("licensePlate").value
+            // )
+            // .call()
+            // .then(function(result) {
+            //   document.getElementById("dataArea").innerHTML = result;
+            // })
+            alert("uhuhu World");
+        }
+
+
+        // action on submit
+      $("verificationForm").on('submit', function() {
+        alert("Hello World")
+      })
     </script>
   </body>
 </html>
