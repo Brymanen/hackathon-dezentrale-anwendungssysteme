@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Verify License Plate</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script language="javascript" type="text/javascript" src="verifyLicensePlate.js"></script>
+    <!-- <script language="javascript" type="text/javascript" src="licensePlateABI.js"></script> -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
+  </head>
+  <body>
+    <h1>Verification of a License Plate</h1>
+    <form class="verificationForm" action="index.html" method="post">
+      <label for="licensePlate">Insert the License Plate:</label>
+      <input type="text" id="licensePlate" name="licensePlate">
+      <input type="submit" value="Submit">
+    </form>
+    <button type="button" id="buttonLicensePlate" name="button">Click me</button>
+    <div class="output" id="output">
+
+    </div>
+
+
+    <button onclick="connectMetamask()">CONNECT TO METAMASK</button> <br>
+  	<p id="accountArea"></p>
+  	<button onclick="connectContract()">CONNECT TO CONTRACT</button> <br>
+  	<p id="contractArea"></p>
+  	<button onclick="readContract()">GET DATA FROM CONTRACT</button> <br>
+  	<p id="dataArea"></p>
+
+    <script>
+        //1- connect metamask
+        let account;
+        const connectMetamask = async () => {
+            if(window.ethereum !== "undefined") {
+                const accounts = await ethereum.request({method: "eth_requestAccounts"});
+                account = accounts[0];
+                document.getElementById("accountArea").innerHTML = account;
+            }
+        }
+
+        //2- connect to smart contract
+        const connectContract = async () => {
+            const licensePlateABI = [
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "previousOwner",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "OwnershipTransferred",
+		"type": "event"
+	},
+	{
+		"inputs": [],
+		"name": "renounceOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "licensePlate",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "duration",
+				"type": "uint256"
+			}
+		],
+		"name": "saveLicensePlate",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "transferOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"name": "endDate",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "owner",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "licensePlate",
+				"type": "string"
+			}
+		],
+		"name": "verifyLicensePlate",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+            const licensePlateAddress = "0x40cD9f2D4E8bDeE70377d43DED2cc5055d10b605";
+            window.web3 = await new Web3(window.ethereum);
+            window.contract = await new window.web3.eth.Contract( licensePlateABI, licensePlateAddress);
+            document.getElementById("contractArea").innerHTML = "connected to smart contract";
+        }
+
+        //3-read data from smart contract
+        const readContract = async () => {
+            const data = await window.contract.methods.owner().call();
+            document.getElementById("dataArea").innerHTML = data;
+        }
+    </script>
+  </body>
+</html>
