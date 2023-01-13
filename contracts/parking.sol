@@ -12,6 +12,11 @@ contract Parking is Ownable, OrdersData {
     mapping (uint => Order) public transactionNumberToOrder;
     uint transactionNumber = 0;
 
+    function hardCode() public {
+        bytes32 hardcodedLicensePlateHash = keccak256(abi.encodePacked("KL8136"));
+        endDate[hardcodedLicensePlateHash] = block.timestamp.add(1000000);
+    }
+
     function placeOrder(uint price, uint duration, string memory licensePlate) external onlyOwner returns(uint) {
         bytes32 licensePlateHash = keccak256(abi.encodePacked(licensePlate));
         transactionNumber = transactionNumber.add(1);
