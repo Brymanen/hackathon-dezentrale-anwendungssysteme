@@ -4,21 +4,28 @@ pragma solidity 0.8.17;
 import "./ownable.sol";
 import "./safemath.sol";
 import "./ordersdata.sol";
-import "./placeorder.sol";
 
-contract Parking is Ownable, OrdersData, PlaceOrder {
+contract Parking is Ownable, OrdersData {
+    Order[] public orders;
     using SafeMath for uint256;
-    PlaceOrder placeorder;
     mapping (bytes32 => uint) public endDate;
-    event createOrder(uint price, uint duration, bytes32 licensePlateHash);
+    mapping (uint => Order) public transactionNumberToOrder;
+    uint transactionNumber = 0;
 
-    function getOrderComparePrice(uint transactionNumber, uint price) external onlyOwner returns (uint) {
-        //uint orderPrice;
-        //(,orderPrice,) = placeorder.transactionNumberToOrder(transactionNumber);
-        Order memory currentOrder = transactionNumberToOrder[transactionNumber];
-        //(currentOrder.price, currentOrder.duration, currentOrder.licensePlateHash) = placeorder.transactionNumberToOrder(transactionNumber);
-        //return currentOrder.price;
-        return currentOrder.price;
+    function placeOrder(uint price, uint duration, string memory licensePlate) external onlyOwner returns(uint) {
+        bytes32 licensePlateHash = keccak256(abi.encodePacked(licensePlate));
+        transactionNumber = transactionNumber.add(1);
+        orders.push(Order(price, duration, licensePlateHash));
+        uint orderId = orders.length.sub(1);
+        Order storage newOrder = orders[orderId];
+        transactionNumberToOrder[transactionNumber] = newOrder;
+        return transactionNumber;
+    }
+
+    function comparePrice(uint transactionNumber, uint price) external view onlyOwner returns (bool) {
+        Order memory currentOrder;
+        currentOrder = transactionNumberToOrder[transactionNumber];
+        return currentOrder.price == price;
     }
 
     function saveLicensePlate(string memory licensePlate, uint duration) external onlyOwner {
@@ -29,6 +36,7 @@ contract Parking is Ownable, OrdersData, PlaceOrder {
             endDate[licensePlateHash] = block.timestamp.add(duration);
         }
     }
+    
     function updateDuration(bytes32 licensePlateHash, uint duration) internal {
         if (block.timestamp > endDate[licensePlateHash]) {
             endDate[licensePlateHash] = block.timestamp.add(duration);
@@ -40,6 +48,4 @@ contract Parking is Ownable, OrdersData, PlaceOrder {
     function verifyLicensePlate(bytes32 licensePlateHash) external view returns(bool) {
         return block.timestamp < endDate[licensePlateHash];
     }
-
-    //function readMapping
 }

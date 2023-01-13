@@ -24,4 +24,10 @@ contract PlaceOrder is Ownable, OrdersData {
         transactionNumberToOrder[transactionNumber] = newOrder;
         return transactionNumber;
     }
+
+    function getOrder(uint transactionNumber) external view onlyOwner returns(uint price, uint duration, bytes32 licensePlateHash) {
+        Order storage currentOrder;
+        currentOrder = transactionNumberToOrder[transactionNumber];
+        return (currentOrder.price, currentOrder.duration, currentOrder.licensePlateHash);
+    }
 }
