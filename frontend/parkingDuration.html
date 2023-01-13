@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Parking Duration</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <!-- <script language="javascript" type="text/javascript" src="verifyLicensePlate.js"></script> -->
+    <!-- <script language="javascript" type="text/javascript" src="licensePlateABI.js"></script> -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
+    <style>
+      body {
+        margin: 0;
+        font-family: Calibri;
+      }
+
+      .connect_button {
+        background-color: orange;
+        color: white;
+        border: 2px solid orange;
+        border-radius: 4px;
+        padding: 12px 20px;
+        margin: 20px;
+        font-size: 14pt;
+      }
+
+      .connect_button:hover {
+        background-color: #fff;
+        color: #000;
+        cursor: pointer;
+      }
+
+      .container_main {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .lp_content {
+        display: flex;
+        justify-content: center;
+        max-width: 800px;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .verificationForm {
+        margin: 40px 0;
+        width: 100%;
+      }
+
+      .lp_heading {
+        margin-top: 5vw;
+      }
+
+      .verificationForm label {
+        font-size: 20pt;
+      }
+
+      .verificationForm input {
+        width: 100%;
+        padding: 12px 20px;
+        margin: 8px 0;
+        box-sizing: border-box;
+        border: 4px solid orange;
+        border-radius: 10px;
+        font-size: 16pt;
+      }
+
+      .verificationForm input[type=text]:focus {
+        background-color: #eee;
+        border: 4px solid orange;
+        text-decoration: none;
+        outline: none;
+      }
+
+      .lp_button button {
+        transition-duration: 0.4s;
+        background-color: orange;
+        color: white;
+        border: 2px solid orange;
+        border-radius: 4px;
+        padding: 12px 20px;
+        margin: 8px 0;
+        font-size: 16pt;
+      }
+
+      .lp_button button:hover {
+        background-color: #fff;
+        color: #000;
+        cursor: pointer;
+      }
+
+      .output p {
+        font-size: 18pt;
+      }
+
+
+    </style>
+  </head>
+  <body>
+
+    <button class="connect_button" onclick="connectContract()">Connect</button> <br>
+
+    <div class="container_main">
+      <div class="lp_content">
+        <div class="lp_heading">
+          <h1>Save a License Plate</h1>
+        </div>
+        <div class="lp_form">
+          <form class="verificationForm" action="index.html" method="post">
+            <label for="licensePlate">Insert the License Plate:</label><br><br>
+            <input type="text" id="licensePlate" name="licensePlate">
+            <label for="duration">Insert the Duration:</label><br><br>
+            <input type="text" id="duration" name="duration">
+          </form>
+        </div>
+        <div class="lp_button">
+          <button onclick="verifyLicense()" type="button" id="buttonLicensePlate" name="button">Save License Plate</button>
+        </div>
+
+        <div class="output" id="output">
+          <p id="dataArea"></p>
+        </div>
+      </div>
+    </div>
+
+
+
+    <button onclick="connectMetamask()">CONNECT TO METAMASK</button> <br>
+  	<p id="accountArea"></p>
+  	<p id="contractArea"></p>
+  	<button onclick="readContract()">GET DATA FROM CONTRACT</button> <br>
+
+
+    <script>
+        //1- connect metamask
+        let account;
+        const connectMetamask = async () => {
+            if(window.ethereum !== "undefined") {
+                const accounts = await ethereum.request({method: "eth_requestAccounts"});
+                account = accounts[0];
+                document.getElementById("accountArea").innerHTML = account;
+            }
+        }
+
+        //2- connect to smart contract
+        const connectContract = async () => {
+            const licensePlateABI = [
+
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "previousOwner",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "OwnershipTransferred",
+		"type": "event"
+	},
+	{
+		"inputs": [],
+		"name": "hardCode",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "price",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "duration",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "licensePlate",
+				"type": "string"
+			}
+		],
+		"name": "placeOrder",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "renounceOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "licensePlate",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "duration",
+				"type": "uint256"
+			}
+		],
+		"name": "saveLicensePlate",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "transferOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "transactionNumber",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "price",
+				"type": "uint256"
+			}
+		],
+		"name": "comparePrice",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes32",
+				"name": "",
+				"type": "bytes32"
+			}
+		],
+		"name": "endDate",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "orders",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "price",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "duration",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "licensePlateHash",
+				"type": "bytes32"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "owner",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "transactionNumberToOrder",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "price",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "duration",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "licensePlateHash",
+				"type": "bytes32"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "licensePlate",
+				"type": "string"
+			}
+		],
+		"name": "verifyLicensePlate",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+
+];
+            const licensePlateAddress = "0xE0A9bfb526f42C2ce01F2970e89644602B32d0eE";
+            window.web3 = await new Web3(window.ethereum);
+            window.contract = await new window.web3.eth.Contract( licensePlateABI, licensePlateAddress);
+
+        }
+
+        //3-read data from smart contract
+        const readContract = async () => {
+            const data = await window.contract.methods.owner().call();
+            document.getElementById("dataArea").innerHTML = data;
+        }
+
+        const verifyLicense = async () => {
+
+            await window.contract.methods.saveLicensePlate(
+            document.getElementById("licensePlate").value, document.getElementById("duration").value
+            )
+            .send({from: account})
+            .then(function() {
+
+                document.getElementById("dataArea").innerHTML = "License Plate was saved.";
+
+
+            })
+
+        }
+
+
+
+
+    </script>
+  </body>
+</html>
