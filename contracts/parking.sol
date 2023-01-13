@@ -4,15 +4,20 @@ pragma solidity 0.8.17;
 import "./ownable.sol";
 import "./safemath.sol";
 import "./ordersdata.sol";
+import "./placeorder.sol";
 
-contract Parking is Ownable, OrdersData {
+contract Parking is Ownable, OrdersData, PlaceOrder {
     using SafeMath for uint256;
-    OrdersData.Order[] public orders;
-    mapping (uint => OrdersData.Order) public transactionNumberToOrder;
+    PlaceOrder placeorder;
     mapping (bytes32 => uint) public endDate;
+    event createOrder(uint price, uint duration, bytes32 licensePlateHash);
 
     function getOrderComparePrice(uint transactionNumber, uint price) external onlyOwner returns (uint) {
-        OdersData.Order storage currentOrder = orders[orderId];
+        //uint orderPrice;
+        //(,orderPrice,) = placeorder.transactionNumberToOrder(transactionNumber);
+        Order memory currentOrder = transactionNumberToOrder[transactionNumber];
+        //(currentOrder.price, currentOrder.duration, currentOrder.licensePlateHash) = placeorder.transactionNumberToOrder(transactionNumber);
+        //return currentOrder.price;
         return currentOrder.price;
     }
 
@@ -35,4 +40,6 @@ contract Parking is Ownable, OrdersData {
     function verifyLicensePlate(bytes32 licensePlateHash) external view returns(bool) {
         return block.timestamp < endDate[licensePlateHash];
     }
+
+    //function readMapping
 }
