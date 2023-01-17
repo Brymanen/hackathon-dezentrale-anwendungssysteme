@@ -127,10 +127,10 @@
 
 
 
-    <button onclick="connectMetamask()">CONNECT TO METAMASK</button> <br>
+    <!-- <button onclick="connectMetamask()">CONNECT TO METAMASK</button> <br>
   	<p id="accountArea"></p>
   	<p id="contractArea"></p>
-  	<button onclick="readContract()">GET DATA FROM CONTRACT</button> <br>
+  	<button onclick="readContract()">GET DATA FROM CONTRACT</button> <br> -->
 
 
     <script>
@@ -146,6 +146,12 @@
 
         //2- connect to smart contract
         const connectContract = async () => {
+          if(window.ethereum !== "undefined") {
+              const accounts = await ethereum.request({method: "eth_requestAccounts"});
+              account = accounts[0];
+            
+          }
+
             const licensePlateABI = [
 
 	{
